@@ -4,6 +4,7 @@ export interface Worker {
   name: string;
 }
 
+type Theme = "dark" | "light" | "system";
 export interface Task {
   id: number;
   value: String;
@@ -22,6 +23,16 @@ export interface Store {
   socket: WebSocket;
   setSocket: (socket: WebSocket) => void;
   closeSocket: () => void;
+
+  clientId: number | null;
+  setClientId: (id: number) => void;
+
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+
+  messageList: Message[];
+  setMessageList: (messageList: Message[]) => void;
+  appendMessage: (message: Message) => void;
 }
 
 export const useStore = create<Store>()((set) => ({
@@ -50,20 +61,33 @@ export const useStore = create<Store>()((set) => ({
       state.socket.close();
       return {};
     }),
+
+  clientId: null,
+  setClientId: (clientId: number) => set(() => ({ clientId })),
+
+  theme: "system",
+  setTheme: (theme: Theme) => set(() => ({ theme })),
+  messageList: [],
+  setMessageList: (messageList: Message[]) => set(() => ({ messageList })),
+  appendMessage: (message: Message) =>
+    set((state) => ({ messageList: [...state.messageList, message] })),
 }));
 
 export enum MessageType {
-  WorkerConnected,
-  WorkerOffline,
-  TaskInProcss,
-  TaskCompleted,
-  TaskFailed,
+  WorkerConnected = "WorkerConnected",
+  WorkerOffline = "WorkerOffline",
+  TaskInProcess = "TaskInProcess",
+  TaskCompleted = "TaskCompleted",
+  TaskFailed = "TaskFailed",
+  HelloClient = "HelloClient",
+  ClientMessage = "ClientMessage",
 }
 
 export interface Message {
   type: MessageType;
   payload: {
-    worker: Worker;
+    worker: Worker | null;
     task: Task | null;
+    client: { id: number; message: string | null } | null;
   };
 }

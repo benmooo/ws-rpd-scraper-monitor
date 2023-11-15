@@ -15,6 +15,10 @@ export interface Store {
   workers: Worker[];
   appendWorker: (worker: Worker) => void;
   removeWorker: (worker: Worker) => void;
+  setWorkers: (workers: Worker[]) => void;
+
+  workerMessage: Message[];
+  updateWorkerMessage: (message: Message) => void;
 
   tasks: Task[];
   appendTask: (task: Task) => void;
@@ -45,6 +49,21 @@ export const useStore = create<Store>()((set) => ({
     })),
   setWorkers: (workers: Worker[]) => set(() => ({ workers })),
 
+  workerMessage: [],
+  updateWorkerMessage: (message: Message) =>
+    set(({ workerMessage }) => {
+      // filter out the message that contains the worker
+      const filtered = workerMessage.filter(
+        (msg) => msg.payload.worker?.name != message.payload.worker?.name
+      );
+
+      let sorted = [...filtered, message].sort((a, b) =>
+        a.payload.worker!.name.localeCompare(b.payload.worker!.name)
+      );
+
+      return { workerMessage: sorted };
+    }),
+
   tasks: [],
   appendTask: (task: Task) =>
     set((state) => ({ tasks: [...state.tasks, task] })),
@@ -65,7 +84,7 @@ export const useStore = create<Store>()((set) => ({
   clientId: null,
   setClientId: (clientId: number) => set(() => ({ clientId })),
 
-  theme: "system",
+  theme: "light",
   setTheme: (theme: Theme) => set(() => ({ theme })),
   messageList: [],
   setMessageList: (messageList: Message[]) => set(() => ({ messageList })),

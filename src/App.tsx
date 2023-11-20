@@ -1,56 +1,17 @@
-import { useEffect } from "react";
-import { useStore } from "./store";
-import { ModeToggle } from "./components/ModeToggle";
-import ChatBox from "./components/ChatBox";
-import { Workers } from "./components/Workers";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "@/pages/Home";
+import CreateWorker from "@/pages/CreateWorker";
+// ... import other pages
 
-const queryClient = new QueryClient();
-
-function App() {
-  const { theme } = useStore();
-  useEffect(() => {
-    const root = window.document.documentElement;
-    root.classList.remove("light", "dark");
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
-    }
-
-    root.classList.add(theme);
-  }, [theme]);
+const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="relative flex min-h-screen flex-col">
-        <div className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="container flex h-14 items-center">
-            <div className="ml-auto">
-              <ModeToggle></ModeToggle>
-            </div>
-          </div>
-        </div>
-
-        <div className="container flex-1 items-start">
-          <main className="p-2 grow flex-1">
-            <div className="grid grid-cols-3 gap-2">
-              <div className="col-span-2 grid grid-cols-3 gap-2">
-                <Workers></Workers>
-              </div>
-              <div>
-                <ChatBox></ChatBox>
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
-    </QueryClientProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/create-worker" element={<CreateWorker />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;

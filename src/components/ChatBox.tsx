@@ -54,7 +54,8 @@ function ChatBox() {
   const handleSocketMessage = (e: MessageEvent<any>) => {
     const message = JSON.parse(e.data) as Message;
     if (message.type === MessageType.HelloClient) {
-      message.payload.client && setClientId(message.payload.client.id);
+      if (clientId) return;
+      setClientId(message.payload.client!.id);
     }
     appendMessage(message);
   };
@@ -84,7 +85,7 @@ function ChatBox() {
               <>
                 <Avatar>
                   <AvatarFallback className="w-12 h-12 text-lg font-bold rounded-full">
-                    {clientId}
+                    {clientId?.slice(0, 2)}
                   </AvatarFallback>
                 </Avatar>
 
@@ -132,6 +133,7 @@ function ChatBox() {
                     <FormItem className="flex-1">
                       <FormControl>
                         <Input
+                          className="placeholder:font-light"
                           placeholder="It's all about sending a message."
                           {...field}
                         ></Input>

@@ -1,7 +1,27 @@
 import { create } from "zustand";
 
 export interface Worker {
+  id: string;
   name: string;
+  delaySecondsRange: [number, number];
+  status: WorkerStatus;
+  credentials: WorkerCredentials;
+  proxy: string | null;
+  endpoint: string | null;
+  userId: string;
+  deptIds: string;
+}
+interface WorkerCredentials {
+  authorization: string;
+  cookie: string;
+  userAgent: string | null;
+}
+
+enum WorkerStatus {
+  Connected = "Connected",
+  Working = "Working",
+  Idle = "Idle",
+  Offline = "Offline",
 }
 
 type Theme = "dark" | "light" | "system";
@@ -9,6 +29,7 @@ export interface Task {
   id: number;
   value: String;
   retry: number;
+  status: TaskStatus;
 }
 
 export interface Store {
@@ -20,16 +41,32 @@ export interface Store {
   workerMessage: Message[];
   updateWorkerMessage: (message: Message) => void;
 
-  tasks: Task[];
-  appendTask: (task: Task) => void;
-  removeTask: (task: Task) => void;
+  todoTasks: Task[];
+  appendTodoTask: (task: Task) => void;
+  removeTodoTask: (task: Task) => void;
+  setTodoTasks: (tasks: Task[]) => void;
+
+  inProcessTasks: Task[];
+  appendInProcessTask: (task: Task) => void;
+  removeInProcessTask: (task: Task) => void;
+  setInProcessTasks: (tasks: Task[]) => void;
+
+  completeTasks: Task[];
+  appendCompleteTask: (task: Task) => void;
+  removeCompleteTask: (task: Task) => void;
+  setCompleteTasks: (tasks: Task[]) => void;
+
+  failTasks: Task[];
+  appendFailTask: (task: Task) => void;
+  removeFailTask: (task: Task) => void;
+  setFailTasks: (tasks: Task[]) => void;
 
   socket: WebSocket;
   setSocket: (socket: WebSocket) => void;
   closeSocket: () => void;
 
-  clientId: number | null;
-  setClientId: (id: number) => void;
+  clientId: string | null;
+  setClientId: (id: string) => void;
 
   theme: Theme;
   setTheme: (theme: Theme) => void;
@@ -54,26 +91,63 @@ export const useStore = create<Store>()((set) => ({
     set(({ workerMessage }) => {
       // filter out the message that contains the worker
       const filtered = workerMessage.filter(
-        (msg) => msg.payload.worker?.name != message.payload.worker?.name
+        (msg) => msg.payload.worker?.id !== message.payload.worker?.id
       );
 
-      let sorted = [...filtered, message].sort((a, b) =>
+      const msg =
+        message.type === MessageType.WorkerOffline
+          ? filtered
+          : [...filtered, message];
+
+      let sorted = msg.sort((a, b) =>
         a.payload.worker!.name.localeCompare(b.payload.worker!.name)
       );
 
       return { workerMessage: sorted };
     }),
 
-  tasks: [],
-  appendTask: (task: Task) =>
-    set((state) => ({ tasks: [...state.tasks, task] })),
-  removeTask: (task: Task) =>
+  todoTasks: [],
+  appendTodoTask: (task: Task) =>
+    set((state) => ({ todoTasks: [...state.todoTasks, task] })),
+  removeTodoTask: (target: Task) =>
     set((state) => ({
-      tasks: state.tasks.filter((w) => w.id !== task.id),
+      todoTasks: state.todoTasks.filter((task) => task.id !== target.id),
     })),
-  setTasks: (tasks: Task[]) => set(() => ({ tasks })),
+  setTodoTasks: (todoTasks: Task[]) => set(() => ({ todoTasks })),
 
-  socket: new WebSocket("ws://localhost:3030/ws-channel"),
+  inProcessTasks: [],
+  appendInProcessTask: (task: Task) =>
+    set((state) => ({ inProcessTasks: [...state.inProcessTasks, task] })),
+  removeInProcessTask: (target: Task) =>
+    set((state) => ({
+      inProcessTasks: state.inProcessTasks.filter(
+        (task) => task.id !== target.id
+      ),
+    })),
+  setInProcessTasks: (inProcessTasks: Task[]) =>
+    set(() => ({ inProcessTasks })),
+
+  completeTasks: [],
+  appendCompleteTask: (task: Task) =>
+    set((state) => ({ completeTasks: [...state.completeTasks, task] })),
+  removeCompleteTask: (target: Task) =>
+    set((state) => ({
+      completeTasks: state.completeTasks.filter(
+        (task) => task.id !== target.id
+      ),
+    })),
+  setCompleteTasks: (completeTasks: Task[]) => set(() => ({ completeTasks })),
+
+  failTasks: [],
+  appendFailTask: (task: Task) =>
+    set((state) => ({ failTasks: [...state.failTasks, task] })),
+  removeFailTask: (target: Task) =>
+    set((state) => ({
+      failTasks: state.failTasks.filter((task) => task.id !== target.id),
+    })),
+  setFailTasks: (failTasks: Task[]) => set(() => ({ failTasks })),
+
+  socket: new WebSocket("ws://localhost:3000/ws"),
   setSocket: (socket: WebSocket) => set(() => ({ socket })),
   closeSocket: () =>
     set((state) => {
@@ -82,7 +156,11 @@ export const useStore = create<Store>()((set) => ({
     }),
 
   clientId: null,
-  setClientId: (clientId: number) => set(() => ({ clientId })),
+  setClientId: (clientId: string) =>
+    set((state) => {
+      if (!state.clientId) return { clientId };
+      return { clientId: state.clientId };
+    }),
 
   theme: "light",
   setTheme: (theme: Theme) => set(() => ({ theme })),
@@ -100,6 +178,7 @@ export enum MessageType {
   TaskFailed = "TaskFailed",
   HelloClient = "HelloClient",
   ClientMessage = "ClientMessage",
+  ClientLeft = "ClientLeft",
 }
 
 export interface Message {
@@ -107,6 +186,13 @@ export interface Message {
   payload: {
     worker: Worker | null;
     task: Task | null;
-    client: { id: number; message: string | null } | null;
+    client: { id: string; message: string | null } | null;
+    err: string | null;
   };
+}
+export enum TaskStatus {
+  NotTaken = "NotTaken",
+  InProcess = "InProcess",
+  Complete = "Complete",
+  Fail = "Fail",
 }

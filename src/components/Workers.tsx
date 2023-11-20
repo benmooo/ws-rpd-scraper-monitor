@@ -1,15 +1,17 @@
 import { Message, MessageType, useStore } from "@/store";
 import { useEffect } from "react";
-import WorkerCard from "./Worker";
+import WorkerCard from "./WorkerCard";
 
-export function Workers() {
+export default function Workers() {
   const { socket, workerMessage, updateWorkerMessage } = useStore();
   const handleSocketMessage = (e: MessageEvent<any>) => {
     const message = JSON.parse(e.data) as Message;
     if (
       message.type !== MessageType.HelloClient &&
-      message.type !== MessageType.ClientMessage
+      message.type !== MessageType.ClientMessage &&
+      message.type !== MessageType.ClientLeft
     ) {
+      console.log("update message", message);
       updateWorkerMessage(message);
     }
   };
@@ -43,9 +45,9 @@ export function Workers() {
   // }, []);
   return (
     <>
-      {workerMessage?.map((message) => (
+      {workerMessage.map((message) => (
         <WorkerCard
-          key={message.payload.worker!.name}
+          key={message.payload.worker!.id}
           name={message.payload.worker!.name}
           message={message}
         ></WorkerCard>

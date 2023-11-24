@@ -22,8 +22,8 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "name must not be null" })
     .max(100, { message: "name have 100 characters at most" }),
-  delay0: z.number().min(1),
-  delay1: z.number().min(1),
+  delay0: z.number().min(10),
+  delay1: z.number().min(15),
   authorization: z
     .string()
     .min(1, { message: "authorization must not be null" }),

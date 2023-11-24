@@ -1,4 +1,4 @@
-import { Message, MessageType, Task, TaskStatus, useStore } from "@/store";
+import { Message, MessageType, TaskStatus, useStore } from "@/store";
 import { Card, CardContent } from "./ui/card";
 import {
   Circle,

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "./ui/card";
-import { Message, MessageType, Task, useStore } from "@/store";
+import { Message, MessageType, useStore } from "@/store";
 import {
   CheckCircleIcon,
   CircleDashed,

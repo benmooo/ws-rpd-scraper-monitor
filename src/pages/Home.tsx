@@ -12,6 +12,17 @@ import { Progress } from "@/components/ui/progress";
 import axios from "axios";
 import { fetchTasks } from "@/api";
 import { countdown } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const queryClient = new QueryClient();
 
@@ -67,27 +78,46 @@ function Home() {
                   <div className="flex-1 flex flex-col justify-center items-center space-y-4">
                     {/* reload tasks from failed */}
                     <div>
-                      <Button
-                        onClick={() => {
-                          axios
-                            .put(
-                              "http://localhost:3000/reload-tasks-from-failed"
-                            )
-                            .then((resp) => {
-                              console.log(resp.data);
-                              if (resp.data.code == 200) {
-                                setFailTasks([]);
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button className="w-16 h-16">
+                            <ListRestartIcon className="w-16 h-16"></ListRestartIcon>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently reload tasks from failed tasks.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                axios
+                                  .put(
+                                    "http://localhost:3000/reload-tasks-from-failed"
+                                  )
+                                  .then((resp) => {
+                                    if (resp.data.code == 200) {
+                                      setFailTasks([]);
 
-                                fetchTasks(TaskStatus.NotTaken).then((data) =>
-                                  setTodoTasks(data)
-                                );
-                              }
-                            });
-                        }}
-                        className="w-16 h-16"
-                      >
-                        <ListRestartIcon className="w-16 h-16"></ListRestartIcon>
-                      </Button>
+                                      fetchTasks(TaskStatus.NotTaken).then(
+                                        (data) => setTodoTasks(data)
+                                      );
+                                    }
+                                  });
+                              }}
+                            >
+                              Continue
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                     {/* ETA */}
                     <div className="w-full flex flex-col">

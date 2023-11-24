@@ -17,7 +17,7 @@ interface WorkerCredentials {
   userAgent: string | null;
 }
 
-enum WorkerStatus {
+export enum WorkerStatus {
   Connected = "Connected",
   Working = "Working",
   Idle = "Idle",

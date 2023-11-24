@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent } from "./ui/card";
-import { Message, MessageType, useStore } from "@/store";
+import { Message, MessageType, WorkerStatus, useStore } from "@/store";
 import {
   CheckCircleIcon,
   CircleDashed,
@@ -22,10 +22,24 @@ export default function WorkerCard({ name, message }: Props) {
   const { removeWorker } = useStore();
 
   return (
-    <Card className={cn({})}>
+    <Card className={cn("relative")}>
       <CardContent className="p-6">
-        <div className="flex items-center">
-          <p className="font-bold uppercase mr-2 w-16 truncate">{name}</p>
+        <div className="flex items-center relative">
+          <span className="absolute flex h-3 w-3">
+            <span
+              className={cn(
+                "absolute inline-flex h-full w-full rounded-full bg-primary opacity-75",
+                {
+                  "animate-ping":
+                    message.payload.worker?.status === WorkerStatus.Working,
+                }
+              )}
+            ></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+          </span>
+          <p className="flex relative font-bold uppercase mr-2 w-16 truncate ml-5">
+            {name}
+          </p>
           {message.type === MessageType.TaskInProcess && (
             <div className="flex items-center">
               <CircleDashed

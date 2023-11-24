@@ -25,7 +25,7 @@ export default function WorkerCard({ name, message }: Props) {
     <Card className={cn({})}>
       <CardContent className="p-6">
         <div className="flex items-center">
-          <p className="text-lg font-bold uppercase mr-2 w-16">{name}</p>
+          <p className="font-bold uppercase mr-2 w-16 truncate">{name}</p>
           {message.type === MessageType.TaskInProcess && (
             <div className="flex items-center">
               <CircleDashed

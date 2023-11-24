@@ -1,16 +1,31 @@
 import { useEffect } from "react";
-import { useStore } from "@/store";
+import { TaskStatus, useStore } from "@/store";
 import { ModeToggle } from "@/components/ModeToggle";
 import ChatBox from "@/components/ChatBox";
 import Workers from "@/components/Workers";
 import WorkersCount from "@/components/WokersCount";
 import { QueryClient, QueryClientProvider } from "react-query";
 import TasksCount from "@/components/TasksCount";
+import { Button } from "@/components/ui/button";
+import { ListRestartIcon } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import axios from "axios";
+import { fetchTasks } from "@/api";
+import { countdown } from "@/lib/utils";
 
 const queryClient = new QueryClient();
 
 function Home() {
-  const { theme } = useStore();
+  const {
+    theme,
+    failTasks,
+    inProcessTasks,
+    todoTasks,
+    completeTasks,
+    setTodoTasks,
+    setFailTasks,
+    workers,
+  } = useStore();
   useEffect(() => {
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
@@ -47,6 +62,80 @@ function Home() {
                   <div className="flex-none">
                     <div className="grid grid-cols-2 gap-1">
                       <TasksCount></TasksCount>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex flex-col justify-center items-center space-y-4">
+                    {/* reload tasks from failed */}
+                    <div>
+                      <Button
+                        onClick={() => {
+                          axios
+                            .put(
+                              "http://localhost:3000/reload-tasks-from-failed"
+                            )
+                            .then((resp) => {
+                              console.log(resp.data);
+                              if (resp.data.code == 200) {
+                                setFailTasks([]);
+
+                                fetchTasks(TaskStatus.NotTaken).then((data) =>
+                                  setTodoTasks(data)
+                                );
+                              }
+                            });
+                        }}
+                        className="w-16 h-16"
+                      >
+                        <ListRestartIcon className="w-16 h-16"></ListRestartIcon>
+                      </Button>
+                    </div>
+                    {/* ETA */}
+                    <div className="w-full flex flex-col">
+                      <Progress
+                        value={Number(
+                          (
+                            (1 -
+                              todoTasks.length /
+                                (todoTasks.length +
+                                  inProcessTasks.length +
+                                  completeTasks.length +
+                                  failTasks.length)) *
+                            100
+                          ).toFixed(2)
+                        )}
+                        className="w-[60%] mx-auto"
+                      />
+                      <p className="mx-auto">
+                        {Number(
+                          (
+                            (1 -
+                              todoTasks.length /
+                                (todoTasks.length +
+                                  inProcessTasks.length +
+                                  completeTasks.length +
+                                  failTasks.length)) *
+                            100
+                          ).toFixed(2)
+                        )}{" "}
+                        %
+                      </p>
+                    </div>
+                    <div>
+                      ETA:{" "}
+                      {(workers.length > 0 &&
+                        countdown(
+                          todoTasks.length /
+                            workers
+                              .map(
+                                (worker) =>
+                                  2 /
+                                  worker.delaySecondsRange.reduce(
+                                    (acc, n) => acc + n
+                                  )
+                              )
+                              .reduce((acc, n) => acc + n)
+                        )) ||
+                        ""}
                     </div>
                   </div>
                 </div>

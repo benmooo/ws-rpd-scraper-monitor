@@ -11,7 +11,6 @@ export default function Workers() {
       message.type !== MessageType.ClientMessage &&
       message.type !== MessageType.ClientLeft
     ) {
-      console.log("update message", message);
       updateWorkerMessage(message);
     }
   };

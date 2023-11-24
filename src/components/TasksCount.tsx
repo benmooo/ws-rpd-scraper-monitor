@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { fetchTasks } from "@/api";
 
 function TasksCount() {
   const {
@@ -31,12 +32,6 @@ function TasksCount() {
     socket,
   } = useStore();
 
-  const fetchTasks = async (category: TaskStatus) => {
-    const res = await axios.get(
-      `http://localhost:3000/tasks?category=${category}`
-    );
-    return res.data as Task[];
-  };
 
   const handleSocketMessage = (e: MessageEvent<any>) => {
     const message = JSON.parse(e.data) as Message;

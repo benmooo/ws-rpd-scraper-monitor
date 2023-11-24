@@ -52,20 +52,10 @@ export const columns: ColumnDef<Task>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: "id",
-    cell: ({ row }) => <div className="lowercase">{row.id}</div>,
-  },
-  {
-    accessorKey: "value",
-  },
-  {
-    accessorKey: "retry",
-  },
-
-  {
-    accessorKey: "status",
-  },
+  { accessorKey: "id" },
+  { accessorKey: "value" },
+  { accessorKey: "retry" },
+  { accessorKey: "status" },
 ];
 
 function Tasks() {

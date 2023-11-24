@@ -150,22 +150,24 @@ function Home() {
                         %
                       </p>
                     </div>
-                    <div>
-                      ETA:{" "}
-                      {(workers.length > 0 &&
-                        countdown(
-                          todoTasks.length /
-                            workers
-                              .map(
-                                (worker) =>
-                                  2 /
-                                  worker.delaySecondsRange.reduce(
-                                    (acc, n) => acc + n
-                                  )
-                              )
-                              .reduce((acc, n) => acc + n)
-                        )) ||
-                        ""}
+                    <div className="">
+                      <span className="mr-2 font-bold">ETA:</span>
+                      <span>
+                        {(workers.length > 0 &&
+                          countdown(
+                            todoTasks.length /
+                              workers
+                                .map(
+                                  (worker) =>
+                                    2 /
+                                    worker.delaySecondsRange.reduce(
+                                      (acc, n) => acc + n
+                                    )
+                                )
+                                .reduce((acc, n) => acc + n)
+                          )) ||
+                          "---"}
+                      </span>
                     </div>
                   </div>
                 </div>

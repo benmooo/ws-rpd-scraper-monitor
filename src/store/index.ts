@@ -162,7 +162,7 @@ export const useStore = create<Store>()((set) => ({
       return { clientId: state.clientId };
     }),
 
-  theme: "light",
+  theme: "system",
   setTheme: (theme: Theme) => set(() => ({ theme })),
   messageList: [],
   setMessageList: (messageList: Message[]) => set(() => ({ messageList })),

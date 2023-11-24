@@ -9,6 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function TasksCount() {
   const {
@@ -80,39 +81,49 @@ function TasksCount() {
 
   return (
     <>
-      <Card className="w-32 h-32">
-        <CardContent className="flex flex-col justify-center items-center h-full p-0">
-          <Circle className="mx-auto w-10 h-10"></Circle>
-          <div className="text-sm font-light">{TaskStatus.NotTaken}</div>
-          <div className="text-xl font-bold">{todoTasks.length}</div>
-        </CardContent>
-      </Card>
+      <Link to={`/tasks?category=${TaskStatus.NotTaken}`}>
+        <Card className="w-32 h-32">
+          <CardContent className="flex flex-col justify-center items-center h-full p-0">
+            <Circle className="mx-auto w-10 h-10"></Circle>
+            <div className="text-sm font-light">{TaskStatus.NotTaken}</div>
+            <div className="text-xl font-bold">{todoTasks.length}</div>
+          </CardContent>
+        </Card>
+      </Link>
 
-      <Card className="w-32 h-32">
-        <CardContent className="flex flex-col justify-center items-center h-full p-0">
-          <CircleDashed
-            className={cn("mx-auto w-10 h-10", {
-              "animate-spin-slow": inProcessTasks.length > 0,
-            })}
-          ></CircleDashed>
-          <div className="text-sm font-light">{TaskStatus.InProcess}</div>
-          <div className="text-xl font-bold">{inProcessTasks.length}</div>
-        </CardContent>
-      </Card>
-      <Card className="w-32 h-32">
-        <CardContent className="flex flex-col justify-center items-center h-full p-0">
-          <CheckCircleIcon className="mx-auto w-10 h-10"></CheckCircleIcon>
-          <div className="text-sm font-light">{TaskStatus.Complete}</div>
-          <div className="text-xl font-bold">{completeTasks.length}</div>
-        </CardContent>
-      </Card>
-      <Card className="w-32 h-32">
-        <CardContent className="flex flex-col justify-center items-center h-full p-0">
-          <CircleSlash2 className="mx-auto w-10 h-10"></CircleSlash2>
-          <div className="text-sm font-light">{TaskStatus.Fail}</div>
-          <div className="text-xl font-bold">{failTasks.length}</div>
-        </CardContent>
-      </Card>
+      <Link to={`/tasks?category=${TaskStatus.InProcess}`}>
+        <Card className="w-32 h-32">
+          <CardContent className="flex flex-col justify-center items-center h-full p-0">
+            <CircleDashed
+              className={cn("mx-auto w-10 h-10", {
+                "animate-spin-slow": inProcessTasks.length > 0,
+              })}
+            ></CircleDashed>
+            <div className="text-sm font-light">{TaskStatus.InProcess}</div>
+            <div className="text-xl font-bold">{inProcessTasks.length}</div>
+          </CardContent>
+        </Card>
+      </Link>
+
+      <Link to={`/tasks?category=${TaskStatus.Complete}`}>
+        <Card className="w-32 h-32">
+          <CardContent className="flex flex-col justify-center items-center h-full p-0">
+            <CheckCircleIcon className="mx-auto w-10 h-10"></CheckCircleIcon>
+            <div className="text-sm font-light">{TaskStatus.Complete}</div>
+            <div className="text-xl font-bold">{completeTasks.length}</div>
+          </CardContent>
+        </Card>
+      </Link>
+
+      <Link to={`/tasks?category=${TaskStatus.Fail}`}>
+        <Card className="w-32 h-32">
+          <CardContent className="flex flex-col justify-center items-center h-full p-0">
+            <CircleSlash2 className="mx-auto w-10 h-10"></CircleSlash2>
+            <div className="text-sm font-light">{TaskStatus.Fail}</div>
+            <div className="text-xl font-bold">{failTasks.length}</div>
+          </CardContent>
+        </Card>
+      </Link>
     </>
   );
 }
